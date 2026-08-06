@@ -44,8 +44,7 @@ class _AppDetailScreenState extends State<AppDetailScreen> {
       setState(() => _fav = fav);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('$e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
       }
     }
   }
@@ -53,6 +52,7 @@ class _AppDetailScreenState extends State<AppDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: appBg,
       appBar: AppBar(title: const Text('应用详情')),
       body: FutureBuilder<App>(
         future: _future,
@@ -70,11 +70,14 @@ class _AppDetailScreenState extends State<AppDetailScreen> {
               Row(
                 children: [
                   a.icon.isNotEmpty
-                      ? Image.network(a.icon,
-                          width: 72, height: 72, fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) =>
-                              const Icon(Icons.android, size: 72))
-                      : const Icon(Icons.android, size: 72),
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Image.network(a.icon,
+                              width: 72, height: 72, fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) =>
+                                  _phIcon()),
+                        )
+                      : _phIcon(),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(
@@ -82,15 +85,19 @@ class _AppDetailScreenState extends State<AppDetailScreen> {
                       children: [
                         Text(a.title,
                             style: const TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.w700)),
+                                fontSize: 20, fontWeight: FontWeight.w800, color: txt)),
                         const SizedBox(height: 4),
-                        Text(a.developer,
-                            style: const TextStyle(color: softGrey)),
+                        Text(a.developer, style: const TextStyle(color: t2)),
                         if (a.isVip)
-                          const Padding(
-                            padding: EdgeInsets.only(top: 4),
-                            child: Text('VIP 专享',
-                                style: TextStyle(color: kleinBlue)),
+                          Container(
+                            margin: const EdgeInsets.only(top: 6),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                            decoration: BoxDecoration(
+                              gradient: vipGradient,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Text('VIP 专享',
+                                style: TextStyle(color: goldL, fontSize: 11, fontWeight: FontWeight.w700)),
                           ),
                       ],
                     ),
@@ -109,11 +116,21 @@ class _AppDetailScreenState extends State<AppDetailScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: ElevatedButton(
-                      onPressed: a.fileUrl.isEmpty
-                          ? null
-                          : () => _openLink(a.fileUrl),
-                      child: const Text('下载'),
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        gradient: primaryGradient,
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                      ),
+                      child: ElevatedButton(
+                        onPressed: a.fileUrl.isEmpty ? null : () => _openLink(a.fileUrl),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          foregroundColor: Colors.white,
+                          shadowColor: Colors.transparent,
+                          elevation: 0,
+                        ),
+                        child: const Text('下载'),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -121,20 +138,18 @@ class _AppDetailScreenState extends State<AppDetailScreen> {
                     onPressed: () => _toggleFav(a),
                     child: Icon(
                       _fav ? Icons.favorite : Icons.favorite_border,
-                      color: kleinBlue,
+                      color: pri,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 24),
               const Text('简介',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: txt)),
               const SizedBox(height: 8),
               Text(
-                a.description?.isNotEmpty == true
-                    ? a.description!
-                    : a.shortDesc,
-                style: const TextStyle(height: 1.5, color: inkBlack),
+                a.description?.isNotEmpty == true ? a.description! : a.shortDesc,
+                style: const TextStyle(height: 1.5, color: txt),
               ),
             ],
           );
@@ -142,6 +157,16 @@ class _AppDetailScreenState extends State<AppDetailScreen> {
       ),
     );
   }
+
+  Widget _phIcon() => Container(
+        width: 72,
+        height: 72,
+        decoration: BoxDecoration(
+          gradient: primaryGradient,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Icon(Icons.android, size: 36, color: Colors.white),
+      );
 
   Future<void> _openLink(String url) async {
     final uri = Uri.parse(url);
@@ -165,10 +190,9 @@ class _Stat extends StatelessWidget {
       child: Column(
         children: [
           Text(value,
-              style:
-                  const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: txt)),
           const SizedBox(height: 2),
-          Text(label, style: const TextStyle(color: softGrey, fontSize: 12)),
+          Text(label, style: const TextStyle(color: t2, fontSize: 12)),
         ],
       ),
     );

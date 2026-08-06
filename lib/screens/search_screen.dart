@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import '../api/api_client.dart';
-import '../widgets/app_card.dart';
+import '../api/models.dart';
+import '../theme.dart';
+import '../widgets/app_grid.dart';
 import 'app_detail_screen.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+  final String initialQuery;
+  const SearchScreen({super.key, this.initialQuery = ''});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -12,8 +15,17 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   final _ctrl = TextEditingController();
-  List<dynamic> _results = [];
+  List<App> _results = [];
   bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl.text = widget.initialQuery;
+    if (widget.initialQuery.trim().isNotEmpty) {
+      _doSearch(widget.initialQuery);
+    }
+  }
 
   Future<void> _doSearch(String q) async {
     final query = q.trim();
@@ -38,10 +50,11 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: appBg,
       appBar: AppBar(
         title: TextField(
           controller: _ctrl,
-          autofocus: true,
+          autofocus: widget.initialQuery.isEmpty,
           decoration: const InputDecoration(
             hintText: '搜索应用',
             border: InputBorder.none,
@@ -58,22 +71,20 @@ class _SearchScreenState extends State<SearchScreen> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _results.isEmpty
-              ? const Center(child: Text('输入关键词开始搜索'))
-              : ListView.separated(
-                  padding: const EdgeInsets.all(12),
-                  itemCount: _results.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
-                  itemBuilder: (_, i) {
-                    final a = _results[i] as dynamic;
-                    return AppCard(
-                      app: a,
-                      onTap: () => Navigator.push(
+              ? const Center(child: Text('输入关键词开始搜索', style: TextStyle(color: t3)))
+              : ListView(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  children: [
+                    AppGrid(
+                      apps: _results,
+                      onTap: (a) => Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => AppDetailScreen(appId: a.id)),
+                          builder: (_) => AppDetailScreen(appId: a.id),
+                        ),
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
     );
   }

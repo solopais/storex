@@ -1,49 +1,107 @@
 import 'package:flutter/material.dart';
 
-/// 国际克莱因蓝 + 纯白 的高对比编辑风主题
-const Color kleinBlue = Color(0xFF002FA7);
-const Color inkBlack = Color(0xFF1A1A1A);
-const Color softGrey = Color(0xFF8A8A8A);
+/// 匹配移动端 mobile.css 的设计令牌（靛蓝/紫渐变 + 星空底 + 金 VIP）
+
+/// 主色：靛蓝
+const Color pri = Color(0xFF6366F1);
+const Color pri2 = Color(0xFF4F46E5);
+/// 渐变终点：紫
+const Color purple = Color(0xFF7C3AED);
+/// VIP 金
+const Color gold = Color(0xFFC9A54B);
+const Color goldL = Color(0xFFF7D774);
+/// 页面背景（浅灰）
+const Color appBg = Color(0xFFF2F3F7);
+/// 卡片/白
+const Color cardWhite = Color(0xFFFFFFFF);
+/// 文字层级
+const Color txt = Color(0xFF1F2937);
+const Color t2 = Color(0xFF6B7280);
+const Color t3 = Color(0xFF9CA3AF);
+/// 边框
+const Color bd = Color(0xFFE5E7EB);
+/// 状态色
+const Color red = Color(0xFFEF4444);
+const Color grn = Color(0xFF10B981);
+const Color grnB = Color(0xFFD1FAE5);
+const Color redB = Color(0xFFFEE2E2);
+/// 主色浅底
+const Color priL = Color(0xFFEEF2FF);
+/// VIP 徽章深底
+const Color vipDark1 = Color(0xFF1E1E2E);
+const Color vipDark2 = Color(0xFF16213E);
+const Color vipText = Color(0xFF065F46);
+
+/// 主渐变（hero / 按钮 / 图标）
+const LinearGradient primaryGradient = LinearGradient(
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+  colors: [pri, purple],
+);
+
+/// VIP 徽章渐变
+const LinearGradient vipGradient = LinearGradient(
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+  colors: [vipDark1, vipDark2],
+);
 
 final ThemeData appTheme = ThemeData(
   useMaterial3: true,
-  scaffoldBackgroundColor: Colors.white,
-  primaryColor: kleinBlue,
+  scaffoldBackgroundColor: appBg,
+  primaryColor: pri,
   colorScheme: ColorScheme.fromSeed(
-    seedColor: kleinBlue,
-    primary: kleinBlue,
-    background: Colors.white,
+    seedColor: pri,
+    primary: pri,
+    secondary: gold,
+    surface: cardWhite,
+    onSurface: txt,
   ),
   appBarTheme: const AppBarTheme(
-    backgroundColor: Colors.white,
-    foregroundColor: kleinBlue,
+    backgroundColor: cardWhite,
+    foregroundColor: txt,
     elevation: 0,
     centerTitle: false,
+    scrolledUnderElevation: 0,
     titleTextStyle: TextStyle(
-      color: inkBlack,
-      fontSize: 20,
+      color: txt,
+      fontSize: 17,
       fontWeight: FontWeight.w700,
-      letterSpacing: 0.2,
     ),
-    iconTheme: IconThemeData(color: kleinBlue),
+    iconTheme: IconThemeData(color: txt),
   ),
   textTheme: const TextTheme(
-    bodyMedium: TextStyle(color: inkBlack),
-    titleMedium: TextStyle(color: inkBlack, fontWeight: FontWeight.w600),
+    bodyMedium: TextStyle(color: txt),
+    titleMedium: TextStyle(color: txt, fontWeight: FontWeight.w600),
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      backgroundColor: kleinBlue,
+      backgroundColor: pri,
       foregroundColor: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+      minimumSize: const Size(0, 46),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
   ),
-  cardTheme: CardThemeData(
-    color: Colors.white,
-    elevation: 0,
-    shape: RoundedRectangleBorder(
-      side: BorderSide(color: Colors.grey.shade200),
-      borderRadius: BorderRadius.zero,
+  outlinedButtonTheme: OutlinedButtonThemeData(
+    style: OutlinedButton.styleFrom(
+      foregroundColor: pri,
+      side: BorderSide(color: pri),
+      minimumSize: const Size(0, 46),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
+  ),
+  inputDecorationTheme: InputDecorationTheme(
+    border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: bd)),
+    enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: bd)),
+    focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: pri)),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+  ),
+  cardTheme: CardThemeData(
+    color: cardWhite,
+    elevation: 0,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
   ),
 );

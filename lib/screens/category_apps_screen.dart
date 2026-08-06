@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../api/api_client.dart';
 import '../api/models.dart';
-import '../widgets/app_card.dart';
+import '../theme.dart';
+import '../widgets/app_grid.dart';
 import 'app_detail_screen.dart';
 
 class CategoryAppsScreen extends StatefulWidget {
@@ -46,32 +47,35 @@ class _CategoryAppsScreenState extends State<CategoryAppsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: appBg,
       appBar: AppBar(title: Text(widget.category.name)),
       body: _apps.isEmpty && _loading
           ? const Center(child: CircularProgressIndicator())
-          : ListView.separated(
-              padding: const EdgeInsets.all(12),
-              itemCount: _apps.length + (_hasMore ? 1 : 0),
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
-              itemBuilder: (_, i) {
-                if (i == _apps.length) {
-                  _load();
-                  return const Center(
-                      child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: CircularProgressIndicator(),
-                  ));
-                }
-                final a = _apps[i];
-                return AppCard(
-                  app: a,
-                  onTap: () => Navigator.push(
+          : ListView(
+              padding: const EdgeInsets.only(bottom: 16),
+              children: [
+                AppGrid(
+                  apps: _apps,
+                  onTap: (a) => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => AppDetailScreen(appId: a.id)),
+                      builder: (_) => AppDetailScreen(appId: a.id),
+                    ),
                   ),
-                );
-              },
+                ),
+                if (_hasMore)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: _loading
+                          ? const CircularProgressIndicator()
+                          : OutlinedButton(
+                              onPressed: _load,
+                              child: const Text('加载更多'),
+                            ),
+                    ),
+                  ),
+              ],
             ),
     );
   }

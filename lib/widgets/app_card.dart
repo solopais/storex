@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../api/models.dart';
 import '../theme.dart';
 
+/// 匹配移动端 .app-card：白卡、圆角16、竖排居中、VIP金/免费绿徽章
 class AppCard extends StatelessWidget {
   final App app;
   final VoidCallback? onTap;
@@ -10,91 +11,119 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade200),
-          color: Colors.white,
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Material(
+      color: cardWhite,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Stack(
+          clipBehavior: Clip.none,
           children: [
-            _icon(),
-            const SizedBox(width: 12),
-            Expanded(
+            Container(
+              padding: const EdgeInsets.fromLTRB(10, 14, 10, 14),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 3,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          app.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 15,
-                            color: inkBlack,
-                          ),
-                        ),
-                      ),
-                      if (app.isVip)
-                        Container(
-                          margin: const EdgeInsets.only(left: 6),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
-                          color: kleinBlue,
-                          child: const Text('VIP',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 10)),
-                        ),
-                    ],
+                  _icon(),
+                  const SizedBox(height: 10),
+                  Text(
+                    app.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: txt,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    app.shortDesc,
-                    maxLines: 2,
+                    app.shortDesc.isEmpty ? 'v${app.version}' : app.shortDesc,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 12, color: softGrey),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${app.fileSizeText} · ${app.downloads} 下载',
-                    style: const TextStyle(fontSize: 11, color: softGrey),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 10, color: t3),
                   ),
                 ],
               ),
             ),
+            Positioned(top: 8, right: 8, child: _badge()),
           ],
         ),
       ),
     );
   }
 
+  Widget _badge() {
+    if (app.isVip) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        decoration: BoxDecoration(
+          gradient: vipGradient,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: const Text('VIP',
+            style: TextStyle(color: goldL, fontSize: 9, fontWeight: FontWeight.w700)),
+      );
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(color: grnB, borderRadius: BorderRadius.circular(4)),
+      child: const Text('免费',
+          style: TextStyle(color: vipText, fontSize: 9, fontWeight: FontWeight.w700)),
+    );
+  }
+
   Widget _icon() {
-    const placeholder = Icon(Icons.android, size: 52, color: kleinBlue);
-    if (app.icon.isEmpty) return placeholder;
+    final ph = Container(
+      width: 52,
+      height: 52,
+      decoration: BoxDecoration(
+        gradient: primaryGradient,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Center(
+        child: Text(
+          app.title.isNotEmpty ? app.title[0] : '?',
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+    if (app.icon.isEmpty) return ph;
     return ClipRRect(
-      borderRadius: BorderRadius.zero,
+      borderRadius: BorderRadius.circular(14),
       child: Image.network(
         app.icon,
         width: 52,
         height: 52,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => placeholder,
-        loadingBuilder: (_, child, progress) {
-          if (progress == null) return child;
-          return const SizedBox(
+        errorBuilder: (_, __, ___) => ph,
+        loadingBuilder: (_, child, p) {
+          if (p == null) return child;
+          return SizedBox(
             width: 52,
             height: 52,
             child: Center(
               child: SizedBox(
                 width: 16,
                 height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2),
+                child: CircularProgressIndicator(strokeWidth: 2, color: pri),
               ),
             ),
           );

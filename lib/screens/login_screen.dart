@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../api/api_client.dart';
-import '../api/auth_service.dart';
 import '../theme.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -29,12 +28,10 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('欢迎，${u.username}')));
-      // 返回 true 让调用页（MeScreen）刷新登录态
       Navigator.of(context).pop(true);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('$e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
       }
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -44,43 +41,97 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('登录')),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
+      backgroundColor: appBg,
+      body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextField(
-              controller: _userCtrl,
-              textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(
-                labelText: '账号',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _passCtrl,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: '密码',
-                border: OutlineInputBorder(),
-              ),
-              onSubmitted: (_) => _login(),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _loading ? null : _login,
-              child: _loading
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(20, 60, 20, 36),
+              decoration: const BoxDecoration(gradient: primaryGradient),
+              child: const Column(
+                children: [
+                  Icon(Icons.storefront, size: 48, color: Colors.white),
+                  SizedBox(height: 12),
+                  Text('登录 StoreX',
+                      style: TextStyle(
                         color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                      )),
+                  SizedBox(height: 6),
+                  Text('账号登录后即可同步收藏',
+                      style: TextStyle(color: Colors.white70, fontSize: 13)),
+                ],
+              ),
+            ),
+            Transform.translate(
+              offset: const Offset(0, -20),
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: cardWhite,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _userCtrl,
+                      textInputAction: TextInputAction.next,
+                      decoration: const InputDecoration(
+                        labelText: '账号',
+                        prefixIcon: Icon(Icons.person_outline),
                       ),
-                    )
-                  : const Text('登录'),
+                    ),
+                    const SizedBox(height: 14),
+                    TextField(
+                      controller: _passCtrl,
+                      obscureText: true,
+                      decoration: const InputDecoration(
+                        labelText: '密码',
+                        prefixIcon: Icon(Icons.lock_outline),
+                      ),
+                      onSubmitted: (_) => _login(),
+                    ),
+                    const SizedBox(height: 22),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          gradient: primaryGradient,
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                        ),
+                        child: ElevatedButton(
+                          onPressed: _loading ? null : _login,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            elevation: 0,
+                          ),
+                          child: _loading
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text('登录'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
