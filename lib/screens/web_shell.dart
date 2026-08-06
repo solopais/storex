@@ -51,7 +51,8 @@ class _WebShellState extends State<WebShell> {
             setState(() {
               _loading = false;
               _failed = true;
-              _failMsg = e.description ?? '加载失败';
+              _failMsg =
+                  'code=${e.errorCode}  ${e.description}\n${e.url}';
             });
           }
         },
