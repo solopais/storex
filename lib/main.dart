@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/splash_screen.dart';
+import 'screens/web_shell.dart';
 import 'theme.dart';
 
 void main() {
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'StoreX',
       debugShowCheckedModeBanner: false,
       theme: appTheme,
-      home: const SplashScreen(),
+      home: const WebShell(),
     );
   }
 }
