@@ -46,8 +46,9 @@ jobs:
           set -e
           flutter build ios --no-codesign --release
           APP=build/ios/iphoneos/Runner.app
-          # 彻底去签名，适合巨魔(TrollStore)/AltStore 自签
+          # 彻底去签名：移除签名 blob + 残留的 _CodeSignature 目录，产出纯无签名 IPA（巨魔/自签友好）
           codesign --remove-signature --deep --force "$APP" || true
+          find "$APP" -name "_CodeSignature" -type d -exec rm -rf {} + 2>/dev/null || true
           mkdir -p build/ios/ipa/Payload
           cp -r "$APP" build/ios/ipa/Payload/
           cd build/ios/ipa && zip -r ../storex-unsigned.ipa Payload
