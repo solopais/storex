@@ -152,9 +152,17 @@ class _LoggedIn extends StatelessWidget {
     required this.onOpen,
   });
 
+  /// 移动端「我的」页 header 深紫渐变（.me-header）
+  static const _meGrad = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFF1E1B4B), Color(0xFF4C1D95), Color(0xFF7C3AED)],
+  );
+
   @override
   Widget build(BuildContext context) {
-    final initial = user.username.isNotEmpty ? user.username[0].toUpperCase() : '?';
+    final initial =
+        user.username.isNotEmpty ? user.username[0].toUpperCase() : '?';
     return SingleChildScrollView(
       padding: const EdgeInsets.only(bottom: 24),
       child: Column(
@@ -162,53 +170,125 @@ class _LoggedIn extends StatelessWidget {
         children: [
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(20, 48, 20, 24),
-            decoration: const BoxDecoration(gradient: primaryGradient),
+            padding: const EdgeInsets.fromLTRB(20, 48, 20, 28),
+            decoration: const BoxDecoration(gradient: _meGrad),
             child: Column(
               children: [
-                CircleAvatar(
-                  radius: 36,
-                  backgroundColor: Colors.white.withOpacity(0.2),
-                  child: Text(initial,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.w700,
-                      )),
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    CircleAvatar(
+                      radius: 36,
+                      backgroundColor: Colors.white.withValues(alpha: 0.18),
+                      child: Text(initial,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w700,
+                          )),
+                    ),
+                    // 金色 VIP 小星角标
+                    if (user.isVip)
+                      Positioned(
+                        right: -2,
+                        bottom: -2,
+                        child: Container(
+                          padding: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [goldL, gold],
+                            ),
+                            border: Border.all(color: Colors.white, width: 1.5),
+                          ),
+                          child: const Icon(Icons.star,
+                              size: 12, color: Color(0xFF5B4300)),
+                        ),
+                      ),
+                  ],
                 ),
                 const SizedBox(height: 12),
                 Text(user.username,
-                    style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800)),
                 const SizedBox(height: 6),
                 user.isVip
                     ? Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 5),
                         decoration: BoxDecoration(
-                          gradient: vipGradient,
-                          borderRadius: BorderRadius.circular(12),
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Color(0xFFF7D774), Color(0xFFC9A54B)],
+                          ),
+                          borderRadius: BorderRadius.circular(999),
                         ),
                         child: const Text('VIP 会员',
-                            style: TextStyle(color: goldL, fontSize: 12, fontWeight: FontWeight.w700)),
+                            style: TextStyle(
+                                color: Color(0xFF3B2A00),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700)),
                       )
-                    : const Text('普通用户',
-                        style: TextStyle(color: Colors.white70, fontSize: 13)),
+                    : Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: const Text('普通用户',
+                            style: TextStyle(
+                                color: Colors.white70, fontSize: 12)),
+                      ),
               ],
+            ),
+          ),
+          // 统计卡（-60 上移压住 header 底部，与移动端一致）
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+            child: Container(
+              margin: const EdgeInsets.only(top: -28),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              decoration: BoxDecoration(
+                color: cardWhite,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: const [
+                  BoxShadow(
+                      color: Color(0x14000000),
+                      blurRadius: 10,
+                      offset: Offset(0, 3)),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _Stat(
+                        label: '我的收藏', value: '${favorites.length}'),
+                  ),
+                ],
+              ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
             child: Row(
               children: [
-                Expanded(
-                  child: _Stat(label: '我的收藏', value: '${favorites.length}'),
-                ),
+                const Text('我的收藏',
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: txt)),
+                const Spacer(),
+                if (favorites.isNotEmpty)
+                  Text('${favorites.length} 个',
+                      style: const TextStyle(fontSize: 12, color: t3)),
               ],
             ),
-          ),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 12, 16, 4),
-            child: Text('我的收藏',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: txt)),
           ),
           favorites.isEmpty
               ? const Padding(

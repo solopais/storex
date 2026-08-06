@@ -4,6 +4,7 @@ import '../api/api_client.dart';
 import '../api/auth_service.dart';
 import '../api/models.dart';
 import '../theme.dart';
+import '../widgets/html_view.dart';
 import 'login_screen.dart';
 
 class AppDetailScreen extends StatefulWidget {
@@ -147,10 +148,7 @@ class _AppDetailScreenState extends State<AppDetailScreen> {
               const Text('简介',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: txt)),
               const SizedBox(height: 8),
-              Text(
-                a.description?.isNotEmpty == true ? a.description! : a.shortDesc,
-                style: const TextStyle(height: 1.5, color: txt),
-              ),
+              _AppDescription(a: a),
             ],
           );
         },
@@ -176,6 +174,25 @@ class _AppDetailScreenState extends State<AppDetailScreen> {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('无法打开链接：$url')));
     }
+  }
+}
+
+/// 简介富文本渲染：若含 HTML 标签则用 HtmlView（对应移动端关键词高亮/排版），否则纯文本
+class _AppDescription extends StatelessWidget {
+  final App a;
+  const _AppDescription({required this.a});
+
+  @override
+  Widget build(BuildContext context) {
+    final desc =
+        (a.description?.isNotEmpty ?? false) ? a.description! : a.shortDesc;
+    if (desc.contains('<') && desc.contains('>')) {
+      return HtmlView(html: desc);
+    }
+    return Text(
+      desc,
+      style: const TextStyle(height: 1.6, color: txt),
+    );
   }
 }
 
