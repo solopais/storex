@@ -289,7 +289,8 @@ class ApiClient {
   Future<NotifResult> getNotifications({int page = 1}) async {
     final d =
         await _ajax('notifications.php', params: {'page': page.toString()});
-    return NotifResult.fromJson(d is Map ? d : {});
+    final map = d is Map ? Map<String, dynamic>.from(d as Map) : <String, dynamic>{};
+    return NotifResult.fromJson(map);
   }
 
   Future<void> markNotificationsRead() async {
@@ -299,7 +300,8 @@ class ApiClient {
 
   Future<UnreadCount> getUnread() async {
     final d = await _ajax('unread.php');
-    return UnreadCount.fromJson(d is Map ? d : {});
+    final map = d is Map ? Map<String, dynamic>.from(d as Map) : <String, dynamic>{};
+    return UnreadCount.fromJson(map);
   }
 
   Future<Map<String, dynamic>> getMessagesSummary() async => await _get('messages');
