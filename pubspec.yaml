@@ -20,5 +20,11 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^3.0.0
 
+# audioplayers_android 4.0.3 官方包 compileSdk=33，其依赖要求 >=34 导致
+# checkReleaseAarMetadata 失败；vendor 修改版 compileSdk=35（third_party/）。
+dependency_overrides:
+  audioplayers_android:
+    path: third_party/audioplayers_android
+
 flutter:
   uses-material-design: true
