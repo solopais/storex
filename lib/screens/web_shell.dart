@@ -46,13 +46,28 @@ class _WebShellState extends State<WebShell> {
         onPageFinished: (_) {
           if (mounted) setState(() => _loading = false);
         },
+        // 关键：子资源（视频/图片/字体）加载失败不要覆盖主页面错误页
         onWebResourceError: (e) {
+          if (e.isForMainFrame != true) return; // 只处理主框架本身失败
           if (mounted) {
             setState(() {
               _loading = false;
               _failed = true;
               _failMsg =
                   'code=${e.errorCode}  ${e.description}\n${e.url}';
+            });
+          }
+        },
+        // HTTP 层错误也只认主站域名，外链子资源失败一律忽略
+        onHttpError: (e) {
+          final u = e.request?.uri.toString() ?? '';
+          if (!u.startsWith(WebShell.homeUrl)) return;
+          if (mounted) {
+            setState(() {
+              _loading = false;
+              _failed = true;
+              _failMsg =
+                  'HTTP ${e.response?.statusCode} ${e.response?.reasonPhrase}\n$u';
             });
           }
         },
