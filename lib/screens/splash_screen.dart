@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import '../api/api_client.dart';
 import '../api/auth_service.dart';
+import '../globals.dart';
 import '../screens/home_shell.dart';
 import '../theme.dart';
 
@@ -19,6 +21,11 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _init() async {
     await AuthService.instance.init();
+    try {
+      appConfig = await ApiClient.instance.getConfig();
+    } catch (_) {
+      // 配置加载失败不阻塞进入
+    }
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => const HomeShell()),

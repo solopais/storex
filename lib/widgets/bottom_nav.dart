@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
 
-/// 匹配移动端 .bottom-nav（56px、毛玻璃、激活靛蓝）
+/// 匹配移动端 .bottom-nav（56px、毛玻璃、激活靛蓝、4 Tab：推荐/发现/消息/我的）
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
@@ -15,9 +15,10 @@ class BottomNavBar extends StatelessWidget {
   });
 
   static const List<_NavItem> _items = [
-    _NavItem(icon: Icons.home_outlined, active: Icons.home, label: '首页'),
-    _NavItem(icon: Icons.grid_view_outlined, active: Icons.grid_view, label: '分类'),
-    _NavItem(icon: Icons.chat_bubble_outline, active: Icons.chat_bubble, label: '消息'),
+    _NavItem(icon: Icons.home_outlined, active: Icons.home, label: '推荐'),
+    _NavItem(icon: Icons.explore_outlined, active: Icons.explore, label: '发现'),
+    _NavItem(
+        icon: Icons.chat_bubble_outline, active: Icons.chat_bubble, label: '消息'),
     _NavItem(icon: Icons.person_outline, active: Icons.person, label: '我的'),
   ];
 
@@ -59,7 +60,9 @@ class BottomNavBar extends StatelessWidget {
                         size: 22,
                         color: active ? pri : t3,
                       ),
-                      if (i == 2 && messageBadge != null && messageBadge! > 0)
+                      if (i == 2 &&
+                          messageBadge != null &&
+                          messageBadge! > 0)
                         Positioned(
                           top: -4,
                           right: -10,
@@ -73,7 +76,9 @@ class BottomNavBar extends StatelessWidget {
                             ),
                             child: Center(
                               child: Text(
-                                '${messageBadge!}',
+                                messageBadge! > 99
+                                    ? '99+'
+                                    : '$messageBadge',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 10,
@@ -90,7 +95,8 @@ class BottomNavBar extends StatelessWidget {
                     it.label,
                     style: TextStyle(
                       fontSize: 10,
-                      fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                      fontWeight:
+                          active ? FontWeight.w700 : FontWeight.w500,
                       color: active ? pri : t3,
                     ),
                   ),
@@ -108,5 +114,6 @@ class _NavItem {
   final IconData icon;
   final IconData active;
   final String label;
-  const _NavItem({required this.icon, required this.active, required this.label});
+  const _NavItem(
+      {required this.icon, required this.active, required this.label});
 }

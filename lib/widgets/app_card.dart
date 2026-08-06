@@ -1,13 +1,26 @@
 import 'package:flutter/material.dart';
 import '../api/models.dart';
 import '../theme.dart';
+import 'common.dart';
 
-/// 匹配移动端 .app-card：白卡、圆角16、竖排居中、VIP金/免费绿徽章
+/// 一比一对应 mobile.php 的 appCard() + mobile.css 的 .app-card
+/// .app-card{radius16;padding:14px 10px;居中;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+/// .app-card-icon(-ph){52x52;radius14;margin-bottom:10}
+/// .app-card-icon-ph 渐变固定为 linear-gradient(135deg,#6B7280,#4B5563)（见 mobile.php 内联样式）
+/// .app-card-name{13/700} .app-card-desc{10;t3;margin-top:4}
+/// .app-card-badge{top:8;right:8;9px/700;padding:2px 6px;radius4}
+/// .vip{linear-gradient(135deg,#1E1E2E,#16213E);color:--goldl}  .free{--grnb;#065F46}
 class AppCard extends StatelessWidget {
   final App app;
+  final bool forceVip;
   final VoidCallback? onTap;
 
-  const AppCard({super.key, required this.app, this.onTap});
+  const AppCard({
+    super.key,
+    required this.app,
+    this.forceVip = false,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,117 +30,87 @@ class AppCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: onTap,
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Container(
-              padding: const EdgeInsets.fromLTRB(10, 14, 10, 14),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 3,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _icon(),
-                  const SizedBox(height: 10),
-                  Text(
-                    app.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: txt,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: cardShadow,
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    NetImg(
+                      url: app.icon,
+                      width: 52,
+                      height: 52,
+                      radius: 14,
+                      placeholder: InitialBox(
+                        text: app.title,
+                        size: 52,
+                        radius: 14,
+                        fontSize: 22,
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0xFF6B7280), Color(0xFF4B5563)],
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    app.shortDesc.isEmpty ? 'v${app.version}' : app.shortDesc,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 10, color: t3),
-                  ),
-                ],
+                    const SizedBox(height: 10),
+                    Text(
+                      app.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: txt,
+                        height: 1.25,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      app.shortDesc.isEmpty ? 'v${app.version}' : app.shortDesc,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          fontSize: 10, color: t3, height: 1.25),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Positioned(top: 8, right: 8, child: _badge()),
-          ],
+              Positioned(top: 8, right: 8, child: _badge()),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _badge() {
-    if (app.isVip) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-        decoration: BoxDecoration(
-          gradient: vipGradient,
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: const Text('VIP',
-            style: TextStyle(color: goldL, fontSize: 9, fontWeight: FontWeight.w700)),
-      );
-    }
+    final vip = forceVip || app.isVip;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(color: grnB, borderRadius: BorderRadius.circular(4)),
-      child: const Text('免费',
-          style: TextStyle(color: vipText, fontSize: 9, fontWeight: FontWeight.w700)),
-    );
-  }
-
-  Widget _icon() {
-    final ph = Container(
-      width: 52,
-      height: 52,
       decoration: BoxDecoration(
-        gradient: primaryGradient,
-        borderRadius: BorderRadius.circular(14),
+        gradient: vip ? vipGradient : null,
+        color: vip ? null : grnB,
+        borderRadius: BorderRadius.circular(4),
       ),
-      child: Center(
-        child: Text(
-          app.title.isNotEmpty ? app.title[0] : '?',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 22,
-            fontWeight: FontWeight.w700,
-          ),
+      child: Text(
+        vip ? 'VIP' : '免费',
+        style: TextStyle(
+          color: vip ? goldL : vipText,
+          fontSize: 9,
+          fontWeight: FontWeight.w700,
+          height: 1.2,
         ),
-      ),
-    );
-    if (app.icon.isEmpty) return ph;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(14),
-      child: Image.network(
-        app.icon,
-        width: 52,
-        height: 52,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => ph,
-        loadingBuilder: (_, child, p) {
-          if (p == null) return child;
-          return SizedBox(
-            width: 52,
-            height: 52,
-            child: Center(
-              child: SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2, color: pri),
-              ),
-            ),
-          );
-        },
       ),
     );
   }

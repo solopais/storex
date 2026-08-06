@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import '../api/models.dart';
-import '../widgets/app_card.dart';
+import 'app_card.dart';
 
-/// 匹配移动端 .app-card 网格（3 列）
+/// 一比一对应 mobile.css：
+/// .app-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0 16px;margin-bottom:16px}
 class AppGrid extends StatelessWidget {
   final List<App> apps;
   final ValueChanged<App> onTap;
+  final bool forceVipBadge; // appCard($a, true) —— VIP专属区块强制显示 VIP 徽章
   final EdgeInsetsGeometry padding;
 
   const AppGrid({
     super.key,
     required this.apps,
     required this.onTap,
-    this.padding = const EdgeInsets.fromLTRB(12, 8, 12, 8),
+    this.forceVipBadge = false,
+    this.padding = const EdgeInsets.fromLTRB(16, 0, 16, 16),
   });
 
   @override
@@ -22,14 +25,15 @@ class AppGrid extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       padding: padding,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
+        crossAxisCount: 2,
         mainAxisSpacing: 10,
         crossAxisSpacing: 10,
-        childAspectRatio: 0.72,
+        mainAxisExtent: 132, // 14+52+10+18+4+14 ≈ .app-card 实际高度
       ),
       itemCount: apps.length,
       itemBuilder: (_, i) => AppCard(
         app: apps[i],
+        forceVip: forceVipBadge,
         onTap: () => onTap(apps[i]),
       ),
     );
