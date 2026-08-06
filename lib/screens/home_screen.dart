@@ -7,6 +7,8 @@ import '../theme.dart';
 import '../widgets/app_grid.dart';
 import '../widgets/common.dart';
 import '../widgets/music_player.dart';
+import '../widgets/notice_row.dart';
+import '../widgets/weather_bar.dart';
 import 'app_detail_screen.dart';
 import 'app_list_screen.dart';
 import 'article_detail_screen.dart';
@@ -156,7 +158,7 @@ class _HomeBodyState extends State<HomeBody> {
           );
         }
         final d = snap.data!;
-        final musicOn = appConfig?.musicEnabled ?? false;
+        const musicOn = true; // 1:1 复刻移动端首页一直显示音乐播放器
 
         return RefreshIndicator(
           color: pri,
@@ -171,13 +173,14 @@ class _HomeBodyState extends State<HomeBody> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const WeatherBar(),
                 if (d.slides.isNotEmpty) _SlideWrap(slides: d.slides),
                 _SearchBar(
                   controller: _searchCtrl,
                   onSubmit: _doSearch,
                   onClear: _clearSearch,
                 ),
-                if (musicOn) const MusicPlayer(),
+                const MusicPlayer(),
                 if (_searching)
                   _searchResultsView()
                 else
@@ -262,9 +265,9 @@ class _HomeBodyState extends State<HomeBody> {
               children: [
                 for (var i = 0; i < d.articles.length; i++) ...[
                   if (i > 0) const SizedBox(height: 10),
-                  ArticleRow(
+                  NoticeRow(
+                    id: d.articles[i].id,
                     title: d.articles[i].title,
-                    thumbnail: d.articles[i].thumbnail,
                     summary: d.articles[i].summary,
                     views: d.articles[i].views,
                     comments: d.articles[i].comments,
