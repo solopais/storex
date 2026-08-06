@@ -11,10 +11,11 @@
 .swiftpm/
 migrate_working_dir/
 
-# IntelliJ related
+# IntelliJ / Android Studio
 *.iml
 *.ipr
 *.iws
+.idea/
 
 # Flutter/Dart/Pub related
 **/doc/api/
@@ -28,8 +29,6 @@ migrate_working_dir/
 flutter_*.png
 linked_*.ds
 unlinked.ds
-.bat
-local.properties
 flutter_export_environment.sh
 .packages
 .project
@@ -37,11 +36,8 @@ flutter_export_environment.sh
 .settings/
 
 # Android related
-**/android/**/gradle-wrapper.jar
 .gradle/
 **/android/captures/
-**/android/gradlew
-**/android/gradlew.bat
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
 **/android/key.properties
@@ -70,3 +66,6 @@ flutter_export_environment.sh
 
 # Coverage
 coverage/
+
+# Build artifacts
+*.apk

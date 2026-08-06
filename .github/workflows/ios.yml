@@ -9,12 +9,12 @@ permissions:
   contents: read
 
 env:
-  FLUTTER_VERSION: "3.24.5"
-  # iOS Bundle ID（对应 flutter create --org cn.solopai --project-name storex_app）
-  BUNDLE_ID: "cn.solopai.storexApp"
+  FLUTTER_VERSION: "3.44.8"
+  # flutter create --org cn.solopai --project-name storex_app 生成的包名（下划线）
+  BUNDLE_ID: "cn.solopai.storex_app"
 
 jobs:
-  # ---------- iOS IPA ----------
+  # ---------- iOS IPA（macOS runner，能出真机可装的包） ----------
   build-ios:
     runs-on: macos-latest
     steps:
@@ -28,18 +28,14 @@ jobs:
           channel: "stable"
           cache: true
 
-      - name: Prepare native scaffolding
-        # 我们手写的 Dart 源码在 lib/ 里，但 ios/android/web 原生脚手架需 flutter 生成。
-        # 先备份 lib/ -> flutter create 生成原生工程 -> 用备份覆盖回去（避免被默认计数器 demo 覆盖）。
-        run: |
-          cp -r lib /tmp/storex_lib
-          flutter create --org cn.solopai --project-name storex_app .
-          rm -rf lib
-          cp -r /tmp/storex_lib lib
-          rm -f test/widget_test.dart
+      - name: Install CocoaPods
+        run: which pod || brew install cocoapods
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Pod install
+        run: cd ios && pod install
 
       - name: Build (no codesign — 仅验证可编译)
         if: ${{ secrets.P12_BASE64 == '' }}
@@ -99,6 +95,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -106,13 +108,13 @@ jobs:
           channel: "stable"
           cache: true
 
-      - name: Prepare native scaffolding
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install SDK platforms / build-tools / NDK
         run: |
-          cp -r lib /tmp/storex_lib
-          flutter create --org cn.solopai --project-name storex_app .
-          rm -rf lib
-          cp -r /tmp/storex_lib lib
-          rm -f test/widget_test.dart
+          yes | sdkmanager --licenses
+          sdkmanager "platforms;android-36" "build-tools;36.0.0" "ndk;28.2.13676358"
 
       - name: Install dependencies
         run: flutter pub get
