@@ -1,9 +1,11 @@
-name: Build StoreX App
+name: Build iOS IPA
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ]
+  # 注：push 不触发本 workflow，避免 macOS runner 排队拖累 Android 独立构建
+  #      如需每次 push 也打 IPA，把下面两行取消注释（但免费 macOS 额度紧张时易排队取消）
+  # push:
+  #   branches: [ main ]
 
 permissions:
   contents: read
@@ -85,7 +87,7 @@ jobs:
 
           cat > /tmp/export.plist <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.app.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
           <dict>
             <key>method</key><string>ad-hoc</string>
@@ -107,45 +109,4 @@ jobs:
         with:
           name: storex-ios-ipa
           path: build/ios/ipa/*.ipa
-          if-no-files-found: error
-
-  # ---------- Android APK（默认 debug 签名即可安装到真机） ----------
-  build-android:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: "stable"
-          cache: true
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install SDK platforms / build-tools / NDK
-        run: |
-          yes | sdkmanager --licenses
-          sdkmanager "platforms;android-36" "build-tools;36.0.0" "ndk;28.2.13676358"
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Build APK
-        run: flutter build apk --release
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: storex-android-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
