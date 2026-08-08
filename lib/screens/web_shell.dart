@@ -4,13 +4,13 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../theme.dart';
 
-/// 内嵌 WebView 壳：App 直接加载移动端网页（storex.solopai.cn/mobile.php）
+/// 内嵌 WebView 壳：App 直接加载移动端网页（storex.solopai.cn/m.html）
 /// 所有功能（音乐/聊天/视频/VIP/公告/收藏/登录）随移动端 100% 同步，
 /// 后端更新 App 自动更新，永不脱节。
 class WebShell extends StatefulWidget {
   const WebShell({super.key});
 
-  static const String homeUrl = 'https://storex.solopai.cn/mobile.php';
+  static const String homeUrl = 'https://storex.solopai.cn/m.html';
 
   @override
   State<WebShell> createState() => _WebShellState();
@@ -61,7 +61,10 @@ class _WebShellState extends State<WebShell> {
         // HTTP 层错误也只认主站域名，外链子资源失败一律忽略
         onHttpError: (e) {
           final u = e.request?.uri.toString() ?? '';
-          if (!u.startsWith(WebShell.homeUrl)) return;
+          if (!u.startsWith('https://storex.solopai.cn') &&
+              !u.startsWith('http://storex.solopai.cn')) {
+            return;
+          }
           if (mounted) {
             setState(() {
               _loading = false;
