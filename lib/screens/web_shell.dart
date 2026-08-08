@@ -45,6 +45,14 @@ class _WebShellState extends State<WebShell> {
         },
         onPageFinished: (_) {
           if (mounted) setState(() => _loading = false);
+          // webview_flutter 默认不会把 env(safe-area-inset-*) 传给 web，
+          // 这里把真实状态栏 / 底部 home-indicator 高度注入到 CSS 变量，
+          // 让 .app-header { padding-top: calc(12px + var(--st)) } 真正生效。
+          final mq = MediaQuery.of(context);
+          _ctl.runJavaScript(
+            "document.documentElement.style.setProperty('--st','${mq.padding.top}px');"
+            "document.documentElement.style.setProperty('--sb','${mq.padding.bottom}px');"
+          );
         },
         // 关键：子资源（视频/图片/字体）加载失败不要覆盖主页面错误页
         onWebResourceError: (e) {
