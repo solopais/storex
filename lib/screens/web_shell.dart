@@ -70,7 +70,7 @@ class _WebShellState extends State<WebShell> {
               _loading = false;
               _failed = true;
               _failMsg =
-                  'HTTP ${e.response?.statusCode} ${e.response?.reasonPhrase}\n$u';
+                  'HTTP ${e.response?.statusCode}\n$u';
             });
           }
         },
